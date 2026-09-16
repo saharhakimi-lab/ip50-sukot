@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מבדק מסכם תקשורת רשתות | מורים: סהר & ענאן</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{
+  --bg:#F5EFE0; /* רקע שמנת חם */
+  --panel:#FFFDF7; /* כרטיסיות שמנת בהיר */
+  --panel2:#EFE6D5; /* משטחי משנה */
+  --panel3:#E4DA86; 
+  --border:#D8CDA8; --border2:#CBD5E1;
+  --text:#1F2937; --muted:#4B5563; --muted2:#6B7280;
+  --stick:#1D4ED8;
+  --ok:#059669; --bad:#DC2626; --info:#1D4ED8;
+  --radius:16px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'Varela Round', sans-serif; line-height:1.7;
+  padding-bottom:140px; font-size: 18px;
+}
+
+.mono, code, .eng-text {
+  font-family: 'Fira Code', monospace;
+  direction: ltr;
+  display: inline-block;
+  unicode-bidi: embed;
+}
+.term-code-inline {
+  background: #EAE1D0;
+  border: 1px solid #C8BC9D;
+  padding: 3px 9px;
+  border-radius: 6px;
+  color: #111827;
+  font-size: 0.95em;
+  font-family: 'Fira Code', monospace;
+  font-weight: 600;
+  direction: ltr;
+  display: inline-block;
+}
+
+.wrap{max-width:1150px; margin:0 auto; padding:0 24px;}
+h1,h2,h3{font-weight:700; margin:0 0 10px;}
+p{margin:0 0 14px; color:var(--muted); font-size: 18px;}
+
+.progressbar{position:sticky; top:0; z-index:40; background:rgba(245,239,224,0.95); backdrop-filter:blur(8px); border-bottom:2px solid var(--border); padding:16px 24px;}
+.progressbar-inner{max-width:1150px; margin:0 auto; display:flex; align-items:center; gap:16px;}
+.progressbar-title{font-weight:700; font-size:18px; white-space:nowrap; color:var(--text);}
+.steps{display:flex; gap:4px; flex:1;}
+.step{flex:1; height:8px; border-radius:4px; background:#D8CDA8; position:relative; overflow:hidden;}
+.step.done{background:var(--ok);}
+.progress-pct{font-size:15px; color:var(--muted); font-family:'Fira Code',monospace; font-weight:bold; white-space:nowrap;}
+
+header.hero{padding:50px 0 30px; border-bottom:2px solid var(--border);}
+.hero-content{display:flex; align-items:center; justify-content:space-between; gap:28px;}
+
+.crazy-avatar{
+  width:120px; height:120px; border-radius:50%;
+  border:4px solid var(--stick);
+  box-shadow:0 0 25px rgba(29,78,216,0.3);
+  object-fit:cover; flex-shrink:0;
+  animation:crazySpin 8s linear infinite;
+}
+@keyframes crazySpin {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@media(max-width:720px){
+  .hero-content{flex-direction:column-reverse; align-items:flex-start;}
+  .crazy-avatar{width:85px; height:85px;}
+}
+
+.eyebrow{display:inline-block; font-family:'Fira Code',monospace; font-size:14px; letter-spacing:1px; color:var(--stick); background:rgba(29,78,216,0.12); border:1px solid rgba(29,78,216,0.3); padding:6px 16px; border-radius:20px; margin-bottom:14px; direction:ltr; font-weight:600;}
+h1.title{font-size:40px; margin-bottom:12px; color:var(--text);}
+h1.title b{color:var(--stick); font-weight: inherit;}
+
+.student-card {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-top: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.teacher-note {
+  background: #FEF3C7;
+  border-right: 5px solid #F59E0B;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  font-size: 17px;
+  color: #78350F;
+}
+
+section{padding:40px 0;}
+
+.quiz-q{background:var(--panel); border:2px solid var(--border); border-radius:var(--radius); padding:26px; margin-bottom:22px; box-shadow:0 3px 10px rgba(0,0,0,0.03);}
+.quiz-q-num{font-family:'Fira Code',monospace; color:var(--muted2); font-size:14px; margin-bottom:6px; direction:ltr; text-align:right; font-weight:600;}
+.quiz-q-text { font-size: 19px; font-weight: 700; color: var(--text); }
+.quiz-opts{display:flex; flex-direction:column; gap:10px; margin-top:14px;}
+.quiz-opt{background:var(--panel2); border:2px solid var(--border); border-radius:10px; padding:14px 18px; cursor:pointer; text-align:right; font-size:17px; font-weight:500; transition:all 0.15s;}
+.quiz-opt:hover{border-color:var(--stick); background:#E6DCC8;}
+.quiz-opt.selected{border-color:var(--stick); background:rgba(29,78,216,0.12); font-weight:700;}
+.quiz-opt.correct{background:rgba(5,150,105,0.15) !important; border-color:var(--ok) !important; color:var(--ok) !important; font-weight:700;}
+.quiz-opt.wrong{background:rgba(220,38,38,0.15) !important; border-color:var(--bad) !important; color:var(--bad) !important; font-weight:700;}
+.quiz-opt.disabled{pointer-events:none;}
+.quiz-explain{margin-top:14px; padding:14px; background:var(--panel2); border-radius:10px; font-size:16px; display:none; border-right:4px solid var(--stick);}
+.quiz-explain.show{display:block;}
+
+button.btn{background:var(--stick); color:#FFFFFF; border:none; border-radius:10px; padding:14px 28px; font-family:'Varela Round', sans-serif; font-weight:700; font-size:18px; cursor:pointer; transition:transform .1s, opacity .15s;}
+button.btn:hover{opacity:0.9;}
+button.btn:active{transform:scale(0.97);}
+button.btn.teacher{background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFF;}
+
+.completion{text-align:center; padding:40px 24px; background:var(--panel); border:3px solid var(--ok); border-radius:var(--radius); display:none; margin-top:30px;}
+.completion.show{display:block;}
+
+.footer-note{text-align:center; color:var(--muted2); font-size:14px; margin-top:50px;}
+</style>
+</head>
+<body>
+
+<div class="progressbar">
+  <div class="progressbar-inner">
+    <div class="progressbar-title">📝 מבדק תקשורת רשתות (50 שאלות)</div>
+    <div class="steps" id="stepsBar"></div>
+    <div class="progress-pct" id="progressPct">0/50</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="hero-content">
+    <div class="hero-text">
+      <div class="eyebrow">Networking Fundamentals · Sukkot Exam</div>
+      <h1 class="title">מבדק מסכם: <b>יסודות תקשורת מחשבים</b></h1>
+      <p class="subtitle">הערכת ידע מקיפה בנושאי כתובות IPv4, מסכות רשת, מחלקות, כתובות מיוחדות, כתובות MAC ופרוטוקולי תקשורת.</p>
+    </div>
+    <img src="https://lh3.googleusercontent.com/d/1fzqv93VKIW_VT8-e1HdJxBmbU2sFnwlb" alt="אווטר מסתובב" class="crazy-avatar">
+  </div>
+
+  <div class="student-card">
+    <div class="teacher-note">
+      <b>🌴 לקראת חופשת סוכות הבאה עלינו לטובה!</b><br>
+      המורה <b>סהר</b> והמחנך <b>ענאן</b> גאים בכם מאוד על הדרך, ההשקעה וההתמדה. על אף הקושי והאתגרים המאפיינים את תחילת השנה — הוכחתם רצינות של אלופים. קחו נשימה עמוקה, בהצלחה במבדק וצאו לחופשה בראש מורם! 🌾
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-4 items-center">
+      <label class="font-bold text-lg whitespace-nowrap">שם התלמיד/ה המלא:</label>
+      <input type="text" id="studentName" placeholder="הכנס שם פרטי ומשפחה..." class="w-full p-3 border-2 border-slate-300 rounded-xl font-sans text-lg outline-none focus:border-blue-600 bg-white">
+    </div>
+  </div>
+</header>
+
+<section id="quizSection">
+<div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+  <h2 class="text-2xl font-bold">ענה על כל 50 השאלות:</h2>
+  <button class="btn teacher text-base" onclick="unlockTeacherAnswers()">כניסת מורה 🎓</button>
+</div>
+
+<div id="quizContainer"></div>
+
+<div style="text-align:center; margin-top:35px;">
+  <button class="btn" onclick="submitQuiz()" style="font-size:20px; padding:18px 40px;">הגש מבדק וסנכרן ציון 🚀</button>
+</div>
+</section>
+
+<div class="completion" id="completionBox">
+  <h2 id="scoreTitle" class="text-3xl font-bold mb-2"></h2>
+  <p id="scoreText" class="text-xl text-slate-700 mb-4"></p>
+  <div id="syncStatus" class="text-base font-mono text-blue-700"></div>
+</div>
+
+<div class="footer-note">מערכת מבדקים דיגיטלית — מורשת סהר & ענאן 2026</div>
+</div>
+
+<script>
+/* ⬇️ החלף את הקישור במרכאות למטה ב-Web App URL שקיבלת מגוגל! ⬇️ */
+const GOOGLE_SHEET_WEBHOOK_URL = "";
+
+/* 50 שאלות רב-ברירה */
+const quizData = [
+  // חלק 1: יסודות IPv4 וביטים
+  { q: "ממה מורכבת כתובת IPv4?", opts: ["32 ביטים (4 בייטים) המופרדים בנקודות", "48 ביטים המיוצגים בהקסדצימלי", "128 ביטים המופרדים בנקודתיים", "64 ביטים המיוצגים בספרות עשרוניות"], correct: 0, explain: "כתובת IPv4 מורכבת מ-32 סיביות (Bits), המחולקות ל-4 אוקטטים (בייטים) של 8 ביטים כל אחד." },
+  { q: "כמה ביטים יש בכתובת פיזית מסוג MAC Address?", opts: ["32 ביטים", "48 ביטים", "64 ביטים", "128 ביטים"], correct: 1, explain: "כתובת MAC מורכבת מ-48 סיביות (6 בייטים) ונצרבת בכרטיס הרשת בשכבה 2." },
+  { q: "מה תפקידה המרכזי של מסכת רשת המשנה (Subnet Mask)?", opts: ["להגדיר את מהירות הגלישה באינטרנט", "להפריד בין חלק הרשת (Network ID) לבין חלק המארח (Host ID) בכתובת IP", "להמיר כתובות IP לכתובות MAC", "לספק כתובות IP אוטומטיות לשרת"], correct: 1, explain: "מסכת הרשת מורה לרכיבי התקשורת אילו ביטים שייכים לרשת ואילו שייכים למארחים." },
+  { q: "מהי מסכת רשת המשנה הדיפולטיבית של פרפיקס /24?", opts: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.255"], correct: 2, explain: "פרפיקס /24 פירושו 24 ביטים דלוקים של 1, שהם 255.255.255.0." },
+  { q: "מהי מסכת רשת המשנה הדיפולטיבית של פרפיקס /16?", opts: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.128"], correct: 1, explain: "פרפיקס /16 פירושו 16 ביטים דלוקים, כלומר 255.255.0.0." },
+  { q: "מהי מסכת רשת המשנה הדיפולטיבית של פרפיקס /8?", opts: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.254"], correct: 0, explain: "פרפיקס /8 מציג 8 ביטים ראשונים דלוקים, כלומר 255.0.0.0." },
+
+  // חלק 2: מחלקות Class A, B, C, D, E
+  { q: "לאיזו מחלקה (Class) שייכת הכתובת 10.50.1.20?", opts: ["Class A", "Class B", "Class C", "Class D"], correct: 0, explain: "כתובות שהאוקטט הראשון שלהן נע בטווח 1-127 (ובפרט 10) שייכות ל-Class A." },
+  { q: "לאיזו מחלקה (Class) שייכת הכתובת 172.16.5.100?", opts: ["Class A", "Class B", "Class C", "Class D"], correct: 1, explain: "כתובות בטווח 128-191 באוקטט הראשון שייכות ל-Class B." },
+  { q: "לאיזו מחלקה (Class) שייכת הכתובת 192.168.10.15?", opts: ["Class A", "Class B", "Class C", "Class D"], correct: 2, explain: "כתובות בטווח 192-223 באוקטט הראשון שייכות ל-Class C." },
+  { q: "מה ייעודה של מחלקה Class D (טווח אוקטט ראשון 224-239)?", opts: ["חלוקה למחשבים פרטיים", "שידור קבוצתי (Multicast)", "ניסויים ומחקר מדעי", "שרתי אינטרנט מרכזיים"], correct: 1, explain: "מחלקה D מיועדת לתעבורת Multicast (שידור מולטיקאסט לקבוצת מקבלים)." },
+
+  // חלק 3: כתובות פרטיות, ציבוריות וגלישה
+  { q: "האם הכתובת הפרטית 192.168.1.50 ניתנת לגלישה ישירה באינטרנט ללא NAT?", opts: ["כן, היא כתובת ציבורית לכל דבר", "לא, כתובות פרטיות אינן נתוביות (Non-routable) באינטרנט הציבורי", "כן, בתנאי שהמסכה היא /24", "רק אם מדובר במחשב נייד"], correct: 1, explain: "כתובות פרטיות (RFC 1918) נחסמות בנתבי האינטרנט ואינן יכולות לגלוש ללא תרגום NAT." },
+  { q: "איזו מהכתובות הבאות היא כתובת IP ציבורית (Public IP) שניתן לגלוש איתה ישירות באינטרנט?", opts: ["10.0.0.1", "172.16.0.1", "8.8.8.8", "192.168.1.1"], correct: 2, explain: "8.8.8.8 היא כתובת ציבורית (שייכת ל-Google DNS). השאר הן כתובות פרטיות." },
+  { q: "מהו טווח הכתובות הפרטיות של Class B?", opts: ["10.0.0.0 - 10.255.255.255", "172.16.0.0 - 172.31.255.255", "192.168.0.0 - 192.168.255.255", "169.254.0.0 - 169.254.255.255"], correct: 1, explain: "טווח הכתובות הפרטיות ב-Class B הוא 172.16.0.0 עד 172.31.255.255." },
+
+  // חלק 4: כתובות מיוחדות והטעיות (APIPA, Loopback, Broadcast)
+  { q: "מחשב קיבל כתובת IP בטווח 169.254.55.12. מה המשמעות?", opts: ["המחשב מחובר בהצלחה לשרת ה-DHCP", "זהו כשל בקבלת IP משרת DHCP והמחשב הקצה לעצמו כתובת APIPA", "המחשב גולש כעת באינטרנט במהירות גבוהה", "הכתובת שייכת לשרת ה-DNS המרכזי"], correct: 1, explain: "כתובת APIPA (169.254.x.x) נוצרת אוטומטית ע\"י מערכת ההפעלה כאשר שרת DHCP אינו זמין." },
+  { q: "האם ניתן לגלוש באינטרנט עם כתובת APIPA (169.254.x.x)?", opts: ["כן, ללא שום מגבלה", "לא, כתובת זו מאפשרת תקשורת מקומית בלבד ואינה נתובית לשרתים חיצוניים", "כן, בתנאי שמבצעים Ping ל-Google", "רק אם משנים את מסכת הרשת ל-/8"], correct: 1, explain: "כתובת APIPA אינה כוללת Default Gateway ולכן לא ניתן לגלוש איתה מחוץ לרשת המקומית." },
+  { q: "מה ייעודה של הכתובת המיוחדת 127.0.0.1?", opts: ["כתובת היעד של שרת Google", "כתובת בדיקה עצמית של כרטיס הרשת (Loopback)", "כתובת ה-Broadcast של הרשת המקומית", "כתובת שרת ה-DHCP הדיפולטיבית"], correct: 1, explain: "127.0.0.1 היא כתובת Loopback המשמשת לבדיקת רכיב התקשורת הפנימי במחשב." },
+
+  // חלק 5: חישובי רשת - מזהה רשת, ברודקאסט, כתובת ראשונה
+  { q: "נתונה הכתובת 192.168.10.55/24. מהי כתובת הרשת (Network Address)?", opts: ["192.168.10.0", "192.168.10.1", "192.168.10.255", "192.168.0.0"], correct: 0, explain: "בפרפיקס /24, 3 האוקטטים הראשונים שייכים לרשת והאחרון מתאפס ל-0 עבור כתובת הרשת." },
+  { q: "נתונה הכתובת 192.168.10.55/24. מהי כתובת ה-Broadcast (שידור כולל)?", opts: ["192.168.10.0", "192.168.10.1", "192.168.10.255", "192.168.255.255"], correct: 2, explain: "בכתובת Broadcast כל ביטי המארח נדלקים ל-1, כלומר האוקטט האחרון הופך ל-255." },
+  { q: "נתונה הכתובת 192.168.10.0/24. מהי הכתובת הראשונה שניתן לחלק למחשב (First Usable IP)?", opts: ["192.168.10.0", "192.168.10.1", "192.168.10.2", "192.168.10.254"], correct: 1, explain: "הכתובת הראשונה החוקית לחלוקה היא כתובת הרשת פלוס 1 (192.168.10.1)." },
+  { q: "האם ניתן להגדיר את הכתובת 172.16.0.0/16 ככתובת IP של מחשב קצה?", opts: ["כן, היא כתובת רגילה", "לא, זוהי כתובת רשת (Network Address) ואינה ניתנת לחלוקה למחשב", "כן, בתנאי שהמחשב הוא שרת", "רק אם מגדירים DHCP"], correct: 1, explain: "כתובת רשת (שבה כל ביטי המארח הם 0) מיועדת לייצוג הרשת כולה ואינה ניתנת להקצאה למארח." },
+  { q: "האם ניתן להגדיר את הכתובת 10.255.255.255/8 ככתובת IP של מדפסת ברשת?", opts: ["כן, ללא בעיה", "לא, זוהי כתובת Broadcast ואינה ניתנת לחלוקה למכשיר קצה", "כן, בתנאי שהמדפסת מחוברת לסוויטש", "רק אם משתמשים בכבל מוצלב"], correct: 1, explain: "כתובת Broadcast (שבה כל ביטי המארח דלוקים ל-1) מיועדת לשליחה לכל המכשירים ולא למכשיר יחיד." },
+
+  // חלק 6: פרוטוקולים, פורטים ו-TCP/UDP
+  { q: "איזה פרוטוקול משמש לצפייה בדפי אינטרנט מאובטחים, באיזה פורט הוא עובד ובאיזה פרוטוקול תחבורה?", opts: ["HTTP | Port 80 | UDP", "HTTPS | Port 443 | TCP", "FTP | Port 21 | UDP", "DNS | Port 53 | TCP"], correct: 1, explain: "HTTPS עובד בפורט 443 מעל פרוטוקול התחבורה האמין TCP." },
+  { q: "מהו הפורט והפרוטוקול של שירות התרגום DNS בעת מענה לשאילתות רגילות?", opts: ["Port 53 | UDP", "Port 80 | TCP", "Port 67 | UDP", "Port 22 | TCP"], correct: 0, explain: "DNS משתמש לרוב ב-Port 53 מעל UDP למהירות מרבית." },
+  { q: "איזה פרוטוקול משמש להעברת קבצים, עובד בפורט 21 ומתבסס על TCP?", opts: ["DHCP", "FTP", "SSH", "SNMP"], correct: 1, explain: "FTP (File Transfer Protocol) משתמש בפורט 21 מעל TCP." },
+  { q: "מהם מספרי הפורטים של שירות DHCP (שרת ולקוח) באיזה פרוטוקול תחבורה הם משתמשים?", opts: ["Ports 20/21 | TCP", "Ports 67/68 | UDP", "Ports 110/25 | TCP", "Ports 80/443 | UDP"], correct: 1, explain: "DHCP משתמש בפורטים 67 (שרת) ו-68 (לקוח) מעל פרוטוקול UDP." },
+  { q: "מהו ההבדל המרכזי בין פרוטוקול TCP לפרוטוקול UDP בשכבת התחבורה?", opts: ["TCP איטי ולא אמין, UDP אמין ומאובטח", "TCP מבוסס חיבור ואמין (אישור הגעה), UDP אינו מבוסס חיבור ומהיר", "UDP עובד רק בשכבה 3, TCP בשכבה 7", "אין שום הבדל ביניהם"], correct: 1, explain: "TCP מבטיח הגעת מידע (Connection-oriented), בעוד UDP מעדיף מהירות ללא אישורי הגעה." },
+
+  // שאלות 26-50
+  { q: "נתונה כתובת IP: 10.0.0.0/8. מהי הכתובת האחרונה שניתן לחלק למחשב (Last Usable IP)?", opts: ["10.0.0.255", "10.255.255.254", "10.255.255.255", "10.0.0.254"], correct: 1, explain: "כתובת ה-Broadcast היא 10.255.255.255, ולכן הכתובת החוקית האחרונה היא 10.255.255.254." },
+  { q: "כמה אוקטטים קיימים בכתובת IPv4?", opts: ["2", "4", "6", "8"], correct: 1, explain: "כתובת IPv4 מכילה 4 אוקטטים (בייטים)." },
+  { q: "כמה ביטים יש בכל אוקטט של כתובת IPv4?", opts: ["4 ביטים", "8 ביטים", "16 ביטים", "32 ביטים"], correct: 1, explain: "אוקטט ביוונית/לטינית פירושו שמונה — כל אוקטט מכיל 8 ביטים." },
+  { q: "מהי הכתובת 192.168.1.255/24?", opts: ["כתובת מנגנון APIPA", "כתובת Broadcast של הרשת", "כתובת IP חוקית למחשב קצה", "כתובת הרשת הראשית"], correct: 1, explain: "בסאבנט /24, סיומת 255 מייצגת את כתובת השידור הכולל (Broadcast)." },
+  { q: "איזה פרוטוקול מאפשר התחברות מרחוק מוצפנת ומאובטחת בפורט 22 (TCP)?", opts: ["Telnet", "SSH", "HTTP", "TFTP"], correct: 1, explain: "SSH (Secure Shell) עובד בפורט 22 TCP ומספק תקשורת מרוחקת מוצפנת." },
+  { q: "איזה פרוטוקול משמש להשתלטות מרוחקת ללא הצפנה (טקסט גלוי) בפורט 23 (TCP)?", opts: ["SSH", "Telnet", "FTP", "HTTPS"], correct: 1, explain: "Telnet מעביר נתונים בטקסט גלוי בפורט 23 TCP (אינו מאובטח)." },
+  { q: "לאיזו מחלקה שייכת הכתובת 224.0.0.1?", opts: ["Class A", "Class B", "Class C", "Class D"], correct: 3, explain: "כתובות המתחילות ב-224 עד 239 שייכות למחלקת Class D (Multicast)." },
+  { q: "מהו טווח הכתובות הפרטיות של Class A?", opts: ["10.0.0.0 - 10.255.255.255", "172.16.0.0 - 172.31.255.255", "192.168.0.0 - 192.168.255.255", "127.0.0.0 - 127.255.255.255"], correct: 0, explain: "טווח הכתובות הפרטיות ב-Class A הוא כל טווח ה-10.0.0.0/8." },
+  { q: "מהו טווח הכתובות הפרטיות של Class C?", opts: ["10.0.0.0 - 10.255.255.255", "172.16.0.0 - 172.31.255.255", "192.168.0.0 - 192.168.255.255", "192.168.1.0 - 192.168.1.255"], correct: 2, explain: "טווח הכתובות הפרטיות ב-Class C הוא 192.168.0.0 עד 192.168.255.255." },
+  { q: "מחשב מציג IP: 172.20.5.10 עם מסכה 255.255.0.0. מהו מזהה המארח (Host ID)?", opts: ["172.20", "5.10", "172.20.5", "10"], correct: 1, explain: "המסכה 255.255.0.0 (/16) קובעת ששני האוקטטים האחרונים (5.10) שייכים למארח." },
+  { q: "מהו מזהה הרשת (Network ID) בכתובת 10.1.2.3/8?", opts: ["10.0.0.0", "10.1.0.0", "10.1.2.0", "10.1.2.3"], correct: 0, explain: "בפרפיקס /8, רק האוקטט הראשון (10) הוא מזהה הרשת והשאר מתאפסים." },
+  { q: "איזה פרוטוקול בשכבת האפליקציה עובד בפורט 80 (TCP) ומציג אתרי אינטרנט ללא הצפנה?", opts: ["HTTPS", "HTTP", "DNS", "FTP"], correct: 1, explain: "HTTP עובד בפורט 80 TCP ומעביר דפי אינטרנט בטקסט רגיל." },
+  { q: "איזו כתובת מבין הבאות אינה חוקית להגדרה על מחשב קצה?", opts: ["192.168.1.1", "10.10.10.10", "172.16.255.255/16", "172.16.0.1/16"], correct: 2, explain: "172.16.255.255/16 היא כתובת Broadcast של הרשת ולכן לא ניתן להקצותה למחשב." },
+  { q: "כמה ביטים מוקצים לחלק המארח (Host ID) ברשת עם מסכת /24?", opts: ["8 ביטים", "16 ביטים", "24 ביטים", "32 ביטים"], correct: 0, explain: "מתוך 32 ביטים בכתובת, 24 מוקצים לרשת ו-8 ביטים נותרים למארחים (32-24=8)." },
+  { q: "כמה ביטים מוקצים לחלק הרשת (Network ID) בכתובת עם פרפיקס /16?", opts: ["8 ביטים", "16 ביטים", "24 ביטים", "32 ביטים"], correct: 1, explain: "הפרפיקס /16 מציין ישירות כי 16 ביטים מוקצים מזהה הרשת." },
+  { q: "איזה פרוטוקול מספק תקשורת אמינה על ידי לחיצת יד משולשת (3-Way Handshake)?", opts: ["UDP", "TCP", "IP", "ICMP"], correct: 1, explain: "פרוטוקול TCP מקים חיבור אמין באמצעות תהליך SYN, SYN-ACK, ACK." },
+  { q: "איזה פרוטוקול מעדיף זרימת נתונים מהירה ללא השהייה (כגון שיחות וידאו ומשחקי רשת)?", opts: ["TCP", "UDP", "FTP", "SSH"], correct: 1, explain: "UDP אינו ממתין לאישורי הגעה ולכן מתאים לתקשורת בזמן אמת (Real-time)." },
+  { q: "מהי מסכת הרשת בייצוג עשרוני עבור פרפיקס /24?", opts: ["255.0.0.0", "255.255.0.0", "255.255.255.0", "255.255.255.255"], correct: 2, explain: "24 ביטים רצופים של 1 מיוצגים כ-255.255.255.0." },
+  { q: "מה תתרחש במידה ושני מחשבים באותה רשת יקבלו את אותה כתובת IP סטטית?", opts: ["שניהם יגלשו במהירות כפולה", "תתרחש התנגשות כתובות (IP Address Conflict) והתקשורת תשתבש", "הסוויטש יציג נורית כחולה", "שרת ה-DHCP ימחק את הכתובת"], correct: 1, explain: "כתובת IP חייבת להיות ייחודית ברשת. כפילות גורמת לתקלת IP Conflict." },
+  { q: "מהי כתובת ה-Loopback הדיפולטיבית לבדיקת פרוטוקול IP במחשב?", opts: ["0.0.0.0", "127.0.0.1", "255.255.255.255", "192.168.0.1"], correct: 1, explain: "127.0.0.1 משמשת ככתובת בדיקה פנימית בלולאה סגורה (Local Loopback)." },
+  { q: "באיזה אופן מיוצגת כתובת MAC בדרך כלל?", opts: ["4 מספרים עשרוניים המופרדים בנקודות", "12 ספרות הקסדצימליות בזוגות (למשל AA:BB:CC:DD:EE:FF)", "סדרה של 32 אפסים ואחדים", "כתובת טקסטואלית באותיות באנגלית בלבד"], correct: 1, explain: "כתובת MAC מיוצגת ב-6 זוגות של תווים הקסדצימליים (48 ביטים)." },
+  { q: "איזה פרוטוקול תחבורה מפעיל את שירות ה-DNS בעת העברת טבלאות רשת גדולות בין שרתים (Zone Transfer)?", opts: ["UDP", "TCP", "ICMP", "HTTP"], correct: 1, explain: "בעת העברת אזורים (Zone Transfer) נדרשת אמינות ולכן DNS משתמש ב-TCP בפורט 53." },
+  { q: "מהי הכתובת הראשונה החוקית לחלוקה ברשת 10.0.0.0/8?", opts: ["10.0.0.0", "10.0.0.1", "10.0.0.255", "10.1.0.0"], correct: 1, explain: "כתובת הרשת היא 10.0.0.0, והכתובת החוקית הראשונה למארח היא 10.0.0.1." },
+  { q: "איזו כתובת מייצגת את כל המחשבים ברשת המקומית בעת שידור הודעת Broadcast ברמת שכבה 3?", opts: ["0.0.0.0", "255.255.255.255", "127.0.0.1", "192.168.1.0"], correct: 1, explain: "255.255.255.255 היא כתובת ה-Limited Broadcast לכל המארחים בסגמנט." },
+  { q: "מהי הכתובת 0.0.0.0/0 מייצגת בטבלת ניתוב?", opts: ["כתובת המחשב האישי", "ברירת המחדל / הנתיב הדיפולטיבי (Default Route) לכל יעד לא ידוע", "כתובת שרת ה-DHCP", "כתובת רשת חסומה"], correct: 1, explain: "0.0.0.0/0 מייצגת את ה-Default Route השולח תעבורה שאין עבורה מסלול ספציפי." }
+];
+
+let userAnswers = {};
+
+function renderQuiz(){
+  const container = document.getElementById("quizContainer");
+  if(!container) return;
+  container.innerHTML = "";
+  quizData.forEach((item, qi)=>{
+    const qDiv = document.createElement("div");
+    qDiv.className = "quiz-q";
+    qDiv.id = "quiz-q-" + qi;
+    qDiv.innerHTML = `<div class='quiz-q-num'>שאלה ${qi+1} מתוך ${quizData.length}</div><div class='quiz-q-text'>${item.q}</div>`;
+    
+    const optsDiv = document.createElement("div");
+    optsDiv.className = "quiz-opts";
+    item.opts.forEach((opt, oi)=>{
+      const b = document.createElement("div");
+      b.className = "quiz-opt";
+      b.textContent = opt;
+      b.onclick = ()=>selectOption(qi, oi);
+      optsDiv.appendChild(b);
+    });
+    qDiv.appendChild(optsDiv);
+    
+    const explainDiv = document.createElement("div");
+    explainDiv.className = "quiz-explain";
+    explainDiv.id = "explain-" + qi;
+    explainDiv.textContent = item.explain;
+    qDiv.appendChild(explainDiv);
+    
+    container.appendChild(qDiv);
+  });
+  renderStepsBar();
+}
+
+function selectOption(qi, oi){
+  userAnswers[qi] = oi;
+  const opts = document.querySelectorAll("#quiz-q-" + qi + " .quiz-opt");
+  opts.forEach((el, i)=>{
+    if(i === oi){
+      el.classList.add("selected");
+    } else {
+      el.classList.remove("selected");
+    }
+  });
+  renderStepsBar();
+}
+
+function renderStepsBar(){
+  const bar = document.getElementById("stepsBar");
+  if(!bar) return;
+  bar.innerHTML = "";
+  const total = quizData.length;
+  const answeredCount = Object.keys(userAnswers).length;
+  
+  for(let i=0; i<total; i++){
+    const d = document.createElement("div");
+    d.className = "step" + (userAnswers[i] !== undefined ? " done" : "");
+    bar.appendChild(d);
+  }
+  document.getElementById("progressPct").textContent = `${answeredCount}/${total}`;
+}
+
+async function submitQuiz(){
+  const studentName = document.getElementById("studentName").value.trim();
+  if(!studentName){
+    alert("אנא הזן את שמך המלא בראש הדף לפני הגשת המבדק!");
+    document.getElementById("studentName").focus();
+    return;
+  }
+  
+  const answeredCount = Object.keys(userAnswers).length;
+  if(answeredCount < quizData.length){
+    if(!confirm(`ענית על ${answeredCount} מתוך ${quizData.length} שאלות. האם אתה בטוח שברצונך להגיש?`)){
+      return;
+    }
+  }
+
+  let correctCount = 0;
+  quizData.forEach((item, qi)=>{
+    const selected = userAnswers[qi];
+    const opts = document.querySelectorAll("#quiz-q-" + qi + " .quiz-opt");
+    opts.forEach((el, i)=>{
+      el.classList.add("disabled");
+      if(i === item.correct){
+        el.classList.add("correct");
+      }
+      if(selected === i && selected !== item.correct){
+        el.classList.add("wrong");
+      }
+    });
+    document.getElementById("explain-"+qi).classList.add("show");
+    if(selected === item.correct) correctCount++;
+  });
+
+  const finalScore = Math.round((correctCount / quizData.length) * 100);
+  
+  const box = document.getElementById("completionBox");
+  document.getElementById("scoreTitle").textContent = `כל הכבוד ${studentName}! הציון הסופי שלך: ${finalScore}`;
+  document.getElementById("scoreText").textContent = `ענית נכון על ${correctCount} מתוך ${quizData.length} שאלות (${finalScore}%).`;
+  box.classList.add("show");
+  box.scrollIntoView({ behavior: 'smooth' });
+
+  // סנכרון לגוגל שיטס
+  syncToGoogleSheet(studentName, finalScore, correctCount, quizData.length);
+}
+
+function syncToGoogleSheet(name, score, correct, total){
+  const syncStatus = document.getElementById("syncStatus");
+  syncStatus.textContent = "שולח ציון לגליון המורה...";
+  
+  const payload = {
+    studentName: name,
+    score: score,
+    correctAnswers: correct,
+    totalQuestions: total,
+    timestamp: new Date().toLocaleString('he-IL')
+  };
+
+  fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    syncStatus.textContent = "✔ הציון נרשם בהצלחה בגליון האלקטרוני של המורה!";
+  }).catch(err => {
+    syncStatus.textContent = "קיימת בעיה בתקשורת לגליון, אך הציון מוצג לפניך.";
+  });
+}
+
+function unlockTeacherAnswers() {
+  const pwd = prompt("הזן סיסמת מורה לצפייה בתשובות הנכונות:");
+  if (pwd === "sahar") {
+    alert("אימות מורה הצליח! כל התשובות וההסברים מוצגים כעת.");
+    quizData.forEach((item, qi) => {
+      userAnswers[qi] = item.correct;
+      const opts = document.querySelectorAll("#quiz-q-" + qi + " .quiz-opt");
+      opts.forEach((el, i) => {
+        el.classList.add("disabled");
+        if (i === item.correct) {
+          el.classList.add("correct");
+        }
+      });
+      document.getElementById("explain-" + qi).classList.add("show");
+    });
+    renderStepsBar();
+  } else if (pwd !== null) {
+    alert("סיסמה שגויה! הגישה נדחתה.");
+  }
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
