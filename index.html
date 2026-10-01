@@ -122,6 +122,7 @@ button.btn{background:var(--stick); color:#FFFFFF; border:none; border-radius:10
 button.btn:hover{opacity:0.9;}
 button.btn:active{transform:scale(0.97);}
 button.btn.teacher{background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: #FFF;}
+button.btn.track{background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%); color: #FFF;}
 
 .completion{text-align:center; padding:40px 24px; background:var(--panel); border:3px solid var(--ok); border-radius:var(--radius); display:none; margin-top:30px;}
 .completion.show{display:block;}
@@ -167,7 +168,10 @@ button.btn.teacher{background: linear-gradient(135deg, #10B981 0%, #059669 100%)
 <section id="quizSection">
 <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
   <h2 class="text-2xl font-bold">ענה על כל 50 השאלות:</h2>
-  <button class="btn teacher text-base" onclick="unlockTeacherAnswers()">כניסת מורה 🎓</button>
+  <div class="flex gap-3">
+    <button class="btn track text-base" onclick="openTrackingSheet()">מעקב 📊</button>
+    <button class="btn teacher text-base" onclick="unlockTeacherAnswers()">כניסת מורה 🎓</button>
+  </div>
 </div>
 
 <div id="quizContainer"></div>
@@ -224,7 +228,7 @@ const quizData = [
   { q: "האם ניתן להגדיר את הכתובת 10.255.255.255/8 ככתובת IP של מדפסת ברשת?", opts: ["כן, ללא בעיה", "לא, זוהי כתובת Broadcast ואינה ניתנת לחלוקה למכשיר קצה", "כן, בתנאי שהמדפסת מחוברת לסוויטש", "רק אם משתמשים בכבל מוצלב"], correct: 1, explain: "כתובת Broadcast (שבה כל ביטי המארח דלוקים ל-1) מיועדת לשליחה לכל המכשירים ולא למכשיר יחיד." },
 
   // חלק 6: פרוטוקולים, פורטים ו-TCP/UDP
-  { q: "איזה פרוטוקול משמש לצפייה בדפי אינטרנט מאובטחים, באיזה פורט הוא עובד ובאיזה פרוטוקול תחבורה?", opts: ["HTTP | Port 80 | UDP", "HTTPS | Port 443 | TCP", "FTP | Port 21 | UDP", "DNS | Port 53 | TCP"], correct: 1, explain: "HTTPS עובד בפורט 443 מעל פרוטוקול התחבורה האמין TCP." },
+  { q: "איזה פרוטוקול משמש לצפייה בדפי אינטרנט מאובטח, באיזה פורט הוא עובד ובאיזה פרוטוקול תחבורה?", opts: ["HTTP | Port 80 | UDP", "HTTPS | Port 443 | TCP", "FTP | Port 21 | UDP", "DNS | Port 53 | TCP"], correct: 1, explain: "HTTPS עובד בפורט 443 מעל פרוטוקול התחבורה האמין TCP." },
   { q: "מהו הפורט והפרוטוקול של שירות התרגום DNS בעת מענה לשאילתות רגילות?", opts: ["Port 53 | UDP", "Port 80 | TCP", "Port 67 | UDP", "Port 22 | TCP"], correct: 0, explain: "DNS משתמש לרוב ב-Port 53 מעל UDP למהירות מרבית." },
   { q: "איזה פרוטוקול משמש להעברת קבצים, עובד בפורט 21 ומתבסס על TCP?", opts: ["DHCP", "FTP", "SSH", "SNMP"], correct: 1, explain: "FTP (File Transfer Protocol) משתמש בפורט 21 מעל TCP." },
   { q: "מהם מספרי הפורטים של שירות DHCP (שרת ולקוח) באיזה פרוטוקול תחבורה הם משתמשים?", opts: ["Ports 20/21 | TCP", "Ports 67/68 | UDP", "Ports 110/25 | TCP", "Ports 80/443 | UDP"], correct: 1, explain: "DHCP משתמש בפורטים 67 (שרת) ו-68 (לקוח) מעל פרוטוקול UDP." },
@@ -404,6 +408,15 @@ function unlockTeacherAnswers() {
       document.getElementById("explain-" + qi).classList.add("show");
     });
     renderStepsBar();
+  } else if (pwd !== null) {
+    alert("סיסמה שגויה! הגישה נדחתה.");
+  }
+}
+
+function openTrackingSheet() {
+  const pwd = prompt("הזן סיסמת מורה לצפייה בגליון המעקב:");
+  if (pwd === "sahar") {
+    window.open("https://docs.google.com/spreadsheets/d/1292ubxoH-r6-cytXRR0Dpi_7-vETixehBBRkkQ55-d0/edit?usp=drivesdk", "_blank");
   } else if (pwd !== null) {
     alert("סיסמה שגויה! הגישה נדחתה.");
   }
